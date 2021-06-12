@@ -4,7 +4,9 @@ import static javax.persistence.GenerationType.SEQUENCE;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,8 +15,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import tech.vsj.mercadolivre.form.CaracteristicaRequestForm;
 
 @Entity
 public class Produto {
@@ -41,17 +45,17 @@ public class Produto {
   private Usuario usuarioDono;
 
   public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive Long qtDisponive,
-      Set<CaracteristicaProduto> caracteristicas,
-      @NotBlank @Size(max = 1000, min = 0) String descricao, Categoria categoria,
-      Usuario usuarioDono) {
+      @Size(min = 3) @NotNull List<CaracteristicaRequestForm> caracteristicas, Categoria categoria,
+      @NotBlank @Size(max = 1000, min = 0) String descricao, Usuario usuarioDono) {
     this.nome = nome;
     this.valor = valor;
     this.qtDisponive = qtDisponive;
-    this.caracteristicas = caracteristicas;
     this.descricao = descricao;
-    this.categoria = categoria;
     this.tsCriacao = LocalDateTime.now();
     this.usuarioDono = usuarioDono;
+    this.categoria = categoria;
+    this.caracteristicas =
+        caracteristicas.stream().map(c -> c.toModel(this)).collect(Collectors.toSet());
   }
 
   @Deprecated

@@ -2,16 +2,16 @@ package tech.vsj.mercadolivre.form;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import tech.vsj.mercadolivre.persistence.model.CaracteristicaProduto;
 import tech.vsj.mercadolivre.persistence.model.Categoria;
 import tech.vsj.mercadolivre.persistence.model.Produto;
 import tech.vsj.mercadolivre.persistence.model.Usuario;
@@ -25,7 +25,7 @@ public class ProdutoRequestForm {
   @Positive
   @NotNull
   private BigDecimal valor;
-  
+
   @Positive
   @NotNull
   private Long qtDisponivel;
@@ -33,7 +33,8 @@ public class ProdutoRequestForm {
   @Size(min = 3)
   @NotNull
   @JsonProperty(value = "caracteristicas")
-  private List<CaracteristicaRequestForm> caracteristicas =  new ArrayList<>();
+  @Valid
+  private List<CaracteristicaRequestForm> caracteristicas = new ArrayList<>();
 
   @NotBlank
   @Size(max = 1000, min = 0)
@@ -43,8 +44,8 @@ public class ProdutoRequestForm {
   @ExistValue(domainClass = Categoria.class, fieldName = "id")
   private Long categoria;
 
-  public ProdutoRequestForm(@NotBlank String nome,@NotNull @Positive BigDecimal valor,
-      @NotNull  @Positive Long qtDisponivel,
+  public ProdutoRequestForm(@NotBlank String nome, @NotNull @Positive BigDecimal valor,
+      @NotNull @Positive Long qtDisponivel,
       @Size(min = 3) @NotNull List<CaracteristicaRequestForm> caracteristicas,
       @NotBlank @Size(max = 1000, min = 0) String descricao,
       @NotNull @ExistValue(domainClass = Categoria.class, fieldName = "id") Long categoria) {
@@ -89,13 +90,24 @@ public class ProdutoRequestForm {
   }
 
   public Produto map(EntityManager manager, Usuario usuarioLogado) {
-
     var categoriaFound = manager.find(Categoria.class, this.categoria);
-    Set<CaracteristicaProduto> listCateristicaProdutos = this.caracteristicas
-        .stream().map(CaracteristicaRequestForm::toModel).collect(Collectors.toSet());
 
-    return new Produto(nome, valor, qtDisponivel, listCateristicaProdutos, descricao,
-        categoriaFound, usuarioLogado);
+    return new Produto(this.nome, this.valor, this.qtDisponivel, this.caracteristicas,
+        categoriaFound, this.descricao, usuarioLogado);
+  }
+
+  public Set<String> buscaCaracteristicasIguas() {
+
+    HashSet<String> nomeIguais = new HashSet<>();
+    HashSet<String> resultado = new HashSet<>();
+
+    for (CaracteristicaRequestForm caracteristicaRequestForm : caracteristicas) {
+      var nomeCaracteristica = caracteristicaRequestForm.getNome();
+      if (!nomeIguais.add(nomeCaracteristica)) {
+        resultado.add(nomeCaracteristica);
+      }
+    }
+    return resultado;
   }
 
 }
