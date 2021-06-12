@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @SuppressWarnings("serial")
-public class Usuario implements UserDetails {
+public class Usuario {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "IDUSER_SEQ")
@@ -36,10 +36,18 @@ public class Usuario implements UserDetails {
     this.dtCriacao = dtCriacao;
   }
 
+  @Deprecated
   public Usuario() {
     // Auto-generated constructor stub
   }
+  
+  public Long getIdUser() {
+    return idUser;
+  }
 
+  public String getUsername() {
+    return username;
+  }
 
   public String getPassword() {
     return password;
@@ -51,43 +59,8 @@ public class Usuario implements UserDetails {
 
   @Override
   public String toString() {
-    return String.format("Usuario [userName=%s, password=%s, dtCriacao=%s]", username, password,
-        dtCriacao);
-  }
-
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getUsername() {
-    return username;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    // TODO Auto-generated method stub
-    return false;
+    return String
+        .format("Usuario [idUser=%s, username=%s, dtCriacao=%s]", idUser, username, dtCriacao);
   }
 
 }
