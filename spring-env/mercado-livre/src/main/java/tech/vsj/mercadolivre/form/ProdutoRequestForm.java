@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import tech.vsj.mercadolivre.persistence.model.CaracteristicaProduto;
 import tech.vsj.mercadolivre.persistence.model.Categoria;
 import tech.vsj.mercadolivre.persistence.model.Produto;
 import tech.vsj.mercadolivre.persistence.model.Usuario;
@@ -92,8 +95,14 @@ public class ProdutoRequestForm {
   public Produto map(EntityManager manager, Usuario usuarioLogado) {
     var categoriaFound = manager.find(Categoria.class, this.categoria);
 
-    return new Produto(this.nome, this.valor, this.qtDisponivel, this.caracteristicas,
-        categoriaFound, this.descricao, usuarioLogado);
+    return new Produto(nome, valor, qtDisponivel, getSetCaracteristicaProduto(), categoriaFound,
+        descricao, usuarioLogado);
+  }
+
+  public Function<Produto, Set<CaracteristicaProduto>> getSetCaracteristicaProduto() {
+    return produto -> caracteristicas
+        .stream().map(p -> new CaracteristicaProduto(nome, descricao, produto))
+        .collect(Collectors.toSet());
   }
 
   public Set<String> buscaCaracteristicasIguas() {

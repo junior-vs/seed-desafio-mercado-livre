@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -61,6 +63,20 @@ public class Produto {
   @Deprecated
   public Produto() {
     // Auto-generated constructor stub
+  }
+
+  public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive Long qtDisponive,
+      Function<Produto,  Set<CaracteristicaProduto>> caracteristicas, Categoria categoria,
+      @NotBlank @Size(max = 1000, min = 0) String descricao, Usuario usuarioDono) {
+    this.nome = nome;
+    this.valor = valor;
+    this.qtDisponive = qtDisponive;
+    this.descricao = descricao;
+    this.tsCriacao = LocalDateTime.now();
+    this.usuarioDono = usuarioDono;
+    this.categoria = categoria;
+    this.caracteristicas = caracteristicas.apply(this);
+       
   }
 
   public Long getId() {
