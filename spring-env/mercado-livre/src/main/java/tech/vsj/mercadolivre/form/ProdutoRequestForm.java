@@ -86,22 +86,21 @@ public class ProdutoRequestForm {
 
   @Override
   public String toString() {
-    return String
-        .format(
-            "ProdutoRequestForm [nome=%s, valor=%s, qtDisponive=%s, caracteristicas=%s, descricao=%s, categoria=%s]",
-            nome, valor, qtDisponivel, caracteristicas, descricao, categoria);
+    return String.format(
+        "ProdutoRequestForm [nome=%s, valor=%s, qtDisponive=%s, caracteristicas=%s, descricao=%s, categoria=%s]",
+        nome, valor, qtDisponivel, caracteristicas, descricao, categoria);
   }
 
   public Produto map(EntityManager manager, Usuario usuarioLogado) {
     var categoriaFound = manager.find(Categoria.class, this.categoria);
 
-    return new Produto(nome, valor, qtDisponivel, getSetCaracteristicaProduto(), categoriaFound,
-        descricao, usuarioLogado);
+    return new Produto(nome, valor, qtDisponivel, setCaracteristicaProduto(this.caracteristicas),
+        categoriaFound, descricao, usuarioLogado);
   }
 
-  public Function<Produto, Set<CaracteristicaProduto>> getSetCaracteristicaProduto() {
-    return produto -> caracteristicas
-        .stream().map(p -> new CaracteristicaProduto(nome, descricao, produto))
+  public Function<Produto, Set<CaracteristicaProduto>> setCaracteristicaProduto(
+      List<CaracteristicaRequestForm> caracteristicaRequestForms) {
+    return produto -> caracteristicaRequestForms.stream().map(c -> c.toModel(produto))
         .collect(Collectors.toSet());
   }
 

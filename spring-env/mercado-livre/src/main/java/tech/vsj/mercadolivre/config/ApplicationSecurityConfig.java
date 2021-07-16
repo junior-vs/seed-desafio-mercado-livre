@@ -1,9 +1,11 @@
 package tech.vsj.mercadolivre.config;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import tech.vsj.mercadolivre.shared.JwtAuthenticationFilter;
 import tech.vsj.mercadolivre.shared.TokenManager;
 import tech.vsj.mercadolivre.shared.UsersService;
@@ -32,7 +35,6 @@ import tech.vsj.mercadolivre.shared.UsersService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private static final Logger log = LoggerFactory.getLogger(ApplicationSecurityConfig.class);
 
   @Autowired
   private UsersService usersService;
@@ -50,8 +52,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/produtos/{id:[0-9]+}").permitAll()
-            .antMatchers(HttpMethod.POST, "/usuarios").permitAll()
+            .antMatchers(HttpMethod.GET, "/produtos/{id:[0-9]+}/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/usuarios/**").permitAll()
             .antMatchers("/api/auth/**").permitAll()
             .anyRequest().authenticated()
         .and()

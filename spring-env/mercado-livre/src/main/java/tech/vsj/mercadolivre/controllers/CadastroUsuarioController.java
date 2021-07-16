@@ -16,26 +16,27 @@ import tech.vsj.mercadolivre.form.UsuarioRequestForm;
 
 /**
  * CDD = 1
+ * 
  * @author Valdir Junior
  *
  */
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class CadastroUsuarioController {
 
-  @PersistenceContext
-  private EntityManager manager;
+	@PersistenceContext
+	private EntityManager manager;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-  @PostMapping
-  @Transactional
-  public ResponseEntity<?> cadastro(@RequestBody @Valid final UsuarioRequestForm novoUsuario) {
-    var entity = novoUsuario.map(passwordEncoder);
-    manager.persist(entity);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
-  }
+	@PostMapping("")
+	@Transactional
+	public ResponseEntity<?> cadastro(@RequestBody @Valid final UsuarioRequestForm novoUsuario) {
+		var entity = novoUsuario.map(passwordEncoder);
+		manager.persist(entity);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 
 }
