@@ -15,14 +15,17 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
 import tech.vsj.mercadolivre.form.CaracteristicaRequestForm;
 
 @Entity
+@NamedQueries({@NamedQuery(name = "Produto.buscaPorIdeUsuario",
+    query = "SELECT p FROM Produto p WHERE p.id = :id AND p.usuarioDono = :usuarioDono")})
 public class Produto {
 
   @Id
@@ -46,6 +49,9 @@ public class Produto {
   @ManyToOne
   private Usuario usuarioDono;
 
+  @OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+  private Set<ImagemProduto> imagens = new HashSet<>();
+
   public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive Long qtDisponive,
       @Size(min = 3) @NotNull List<CaracteristicaRequestForm> caracteristicas, Categoria categoria,
       @NotBlank @Size(max = 1000, min = 0) String descricao, Usuario usuarioDono) {
@@ -66,7 +72,7 @@ public class Produto {
   }
 
   public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive Long qtDisponive,
-      Function<Produto,  Set<CaracteristicaProduto>> caracteristicas, Categoria categoria,
+      Function<Produto, Set<CaracteristicaProduto>> caracteristicas, Categoria categoria,
       @NotBlank @Size(max = 1000, min = 0) String descricao, Usuario usuarioDono) {
     this.nome = nome;
     this.valor = valor;
@@ -76,7 +82,7 @@ public class Produto {
     this.usuarioDono = usuarioDono;
     this.categoria = categoria;
     this.caracteristicas = caracteristicas.apply(this);
-       
+
   }
 
   public Long getId() {
@@ -115,6 +121,9 @@ public class Produto {
     return usuarioDono;
   }
 
+  public Set<ImagemProduto> getImagens() {
+    return imagens;
+  }
   @Override
   public String toString() {
     return String
@@ -122,6 +131,12 @@ public class Produto {
             "Produto [id=%s, nome=%s, valor=%s, qtDisponive=%s, caracteristicas=%s, descricao=%s, categoria=%s, tsCriacao=%s, usuarioDono=%s]",
             id, nome, valor, qtDisponive, caracteristicas, descricao, categoria, tsCriacao,
             usuarioDono);
+  }
+
+  public void associaImagem(Set<String> links) {
+    Set<ImagemProduto> imagens =
+        links.stream().map(link -> new ImagemProduto(this, link)).collect(Collectors.toSet());
+    this.imagens.addAll(imagens);
   }
 
 
