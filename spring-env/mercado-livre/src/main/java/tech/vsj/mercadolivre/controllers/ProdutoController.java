@@ -22,10 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.vsj.mercadolivre.components.Uploader;
 import tech.vsj.mercadolivre.domain.dto.ProdutoDTO;
+import tech.vsj.mercadolivre.form.ComentariosRequestForm;
 import tech.vsj.mercadolivre.form.NovasImagensRequestForm;
 import tech.vsj.mercadolivre.form.ProdutoRequestForm;
+import tech.vsj.mercadolivre.persistence.model.Comentario;
 import tech.vsj.mercadolivre.persistence.model.Produto;
 import tech.vsj.mercadolivre.persistence.model.Usuario;
+import tech.vsj.mercadolivre.persistence.repository.ProdutoRespository;
 import tech.vsj.mercadolivre.persistence.repository.UsuarioRepository;
 import tech.vsj.mercadolivre.services.RunAsService;
 import tech.vsj.mercadolivre.validation.ProibeCarecteristicasIguaisValidator;
@@ -47,6 +50,7 @@ public class ProdutoController {
 
   @Autowired
   private Uploader uploaderFake;
+
 
   @InitBinder(value = "ProdutoRequestForm")
   public void init(WebDataBinder binder) {
@@ -75,8 +79,8 @@ public class ProdutoController {
     return ResponseEntity.ok(new ProdutoDTO(find));
   }
 
-  
-  @PostMapping(value="{id:[0-9]+}/imagens")  
+
+  @PostMapping(value = "{id:[0-9]+}/imagens")
   @Transactional
   public ResponseEntity<?> cadastraImagem(@PathVariable Long id,
       @Valid NovasImagensRequestForm novasImagens) {
@@ -96,11 +100,12 @@ public class ProdutoController {
 
   }
 
+
+
   private Optional<Produto> buscaProduto(Long id, Usuario usuario) {
     try {
-      Produto singleResult = manager
-          .createNamedQuery("Produto.buscaPorIdeUsuario", Produto.class).setParameter("id", id)
-          .setParameter("usuarioDono", usuario).getSingleResult();
+      Produto singleResult = manager.createNamedQuery("Produto.buscaPorIdeUsuario", Produto.class)
+          .setParameter("id", id).setParameter("usuarioDono", usuario).getSingleResult();
       log.info(singleResult.toString());
       return Optional.of(singleResult);
     } catch (NoResultException e) {
@@ -109,7 +114,6 @@ public class ProdutoController {
     }
 
   }
-
 
 
 }
